@@ -2,17 +2,15 @@ package com.citi.consumer.consume;
 
 import java.util.concurrent.CountDownLatch;
 
-import javax.jms.JMSException;
-import javax.jms.TextMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.jms.annotation.JmsListener;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Component;
 
-import com.citi.consumer.vo.Customer;
-
+@Component
 public class MQConsumer {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MQConsumer.class);
@@ -29,10 +27,11 @@ public class MQConsumer {
 		return latch;
 	}
 	
-	public void receive(TextMessage message) throws JMSException {
-		Customer cust = (Customer) jmsTemplate.receiveAndConvert(destination);
-		LOGGER.info("received message='{}'", cust.getId());
-		System.out.println("received message=" + cust.getId());
+	@JmsListener(destination = "${listener.activemq.queue}")
+	public void receive(String message){
+		
+		//LOGGER.info("received message='{}'", cust.getId());
+		System.out.println("received message=" + message);
 		latch.countDown();
 	}
 
